@@ -9,9 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.memeapp.core.presentation.MemeTemplate
+import com.example.memeapp.core.presentation.memeTemplates
 import com.example.memeapp.core.theme.MemeCreatorTheme
+import com.example.memeapp.meme_editor.presentation.components.MemeTextBox
 import memeapp.composeapp.generated.resources.Res
 import memeapp.composeapp.generated.resources.meme_template_01
 import org.jetbrains.compose.resources.painterResource
@@ -49,6 +52,27 @@ fun MemeEditorScreen(
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth
         )
+        state.memeTexts.forEach { memeText ->
+            MemeTextBox(
+                memeText = memeText,
+                textBoxInteractionState = state.textBoxInteractionState,
+                maxWidth = 500.dp,
+                maxHeight = 500.dp,
+                onClick = {
+                    onAction(MemeEditorAction.OnSelectMemeText(memeText.id))
+                },
+                onDoubleClick = {
+                    onAction(MemeEditorAction.OnEditMemeText(memeText.id))
+                },
+                onTextChange = {
+                    onAction(MemeEditorAction.OnMemeTextChange(memeText.id, it))
+                },
+                onDeleteClick = {
+                    onAction(MemeEditorAction.OnDeleteMemeTextClick(memeText.id))
+                }
+            )
+        }
+
     }
 }
 
