@@ -3,18 +3,19 @@ package com.example.memeapp.meme_editor.presentation.util
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plcoding.cmp_memecreator.core.theme.Fonts
+import kotlinx.coroutines.NonCancellable.join
 
 @Composable
 fun rememberStrokeTextStyle(
@@ -29,7 +30,7 @@ fun rememberStrokeTextStyle(
         TextStyle(
             color = strokeColor,
             textAlign = textAlign,
-            fontSize = fontSize,
+            fontSize =  fontSize,
             fontFamily = fontFamily,
             drawStyle = Stroke(
                 width = with(density ) { strokeWidth.toPx() },

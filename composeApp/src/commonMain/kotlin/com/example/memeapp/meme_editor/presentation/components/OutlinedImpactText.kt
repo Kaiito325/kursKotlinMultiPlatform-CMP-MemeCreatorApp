@@ -16,7 +16,7 @@ fun OutlinedImpactText(
     strokeTextStyle: TextStyle,
     fillTextStyle: TextStyle,
     modifier: Modifier = Modifier
-    ){
+){
     Box(
         modifier = modifier
     ){
