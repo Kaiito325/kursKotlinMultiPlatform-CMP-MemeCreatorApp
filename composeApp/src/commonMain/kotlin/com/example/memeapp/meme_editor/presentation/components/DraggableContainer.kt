@@ -113,10 +113,10 @@ fun DraggableContainer(
                     memeText = child,
                     textBoxInteractionState = textBoxInteractionState,
                     maxWidth = with(density) {
-                      parentWidth.toDp()  
+                        (parentWidth / child.scale).toDp()
                     },
                     maxHeight = with(density) {
-                        parentHeight.toDp()
+                        (parentHeight / child.scale).toDp()
                     },
                     onClick = {
                         onChildClick(child.id)

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.example.memeapp.meme_editor.presentation
 
 import androidx.compose.foundation.Image
@@ -6,11 +8,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.input.key.Key.Companion.M
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -18,23 +28,38 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.memeapp.core.presentation.MemeTemplate
+import com.example.memeapp.core.presentation.Route
 import com.example.memeapp.core.presentation.memeTemplates
 import com.example.memeapp.core.theme.MemeCreatorTheme
 import com.example.memeapp.meme_editor.presentation.components.BottomBar
+import com.example.memeapp.meme_editor.presentation.components.ConfirmationDialog
+import com.example.memeapp.meme_editor.presentation.components.ConfirmationDialogConfig
 import com.example.memeapp.meme_editor.presentation.components.DraggableContainer
 import com.example.memeapp.meme_editor.presentation.components.MemeTextBox
 import memeapp.composeapp.generated.resources.Res
+import memeapp.composeapp.generated.resources.cancel
+import memeapp.composeapp.generated.resources.leave
+import memeapp.composeapp.generated.resources.leave_editor_message
+import memeapp.composeapp.generated.resources.leave_editor_title
 import memeapp.composeapp.generated.resources.meme_template_01
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MemeEditorRoot(
     template: MemeTemplate,
+    onBackClick: () -> Unit,
     viewModel: MemeEditorViewModel = koinViewModel()
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.hasLeftEditor) {
+        if(state.hasLeftEditor){
+            onBackClick()
+        }
+    }
 
     MemeEditorScreen(
         template = template,
@@ -49,6 +74,12 @@ fun MemeEditorScreen(
     state: MemeEditorState,
     onAction: (MemeEditorAction) -> Unit
 ){
+    BackHandler(
+        enabled = !state.isLeavingWithoutSaving
+    ) {
+        onAction(MemeEditorAction.OnGoBackClick)
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +145,37 @@ fun MemeEditorScreen(
                         .matchParentSize()
                 )
             }
+
+            IconButton(
+                onClick = {
+                    onAction(MemeEditorAction.OnGoBackClick)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+            ){
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                    contentDescription = "Back"
+                )
+            }
         }
+    }
+    if(state.isLeavingWithoutSaving){
+        ConfirmationDialog(
+            config = ConfirmationDialogConfig(
+                title = stringResource(Res.string.leave_editor_title),
+                message = stringResource(Res.string.leave_editor_message),
+                confirmButtonText = stringResource(Res.string.leave),
+                cancelButtonText = stringResource(Res.string.cancel),
+                confirmButtonColor = MaterialTheme.colorScheme.secondary
+            ),
+            onConfirm = {
+                onAction(MemeEditorAction.OnConfirmLeaveWithoutSaving)
+            },
+            onDismiss = {
+                onAction(MemeEditorAction.OnDismissLeaveWithoutSaving)
+            }
+        )
     }
 }
 
